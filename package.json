@@ -1,0 +1,20 @@
+{
+  "name": "anzeige",
+  "version": "0.0.2",
+  "description": "display timelines like \"Afficheur\"",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "NODE_PATH=lib PORT=3001 node app"
+  },
+  "author": "ishiduca@gmail.com",
+  "license": "MIT",
+  "dependencies": {
+    "body": "^5.1.0",
+    "ecstatic": "^1.4.0",
+    "json-stringify-safe": "^5.0.1",
+    "router-line": "^0.2.1",
+    "twitter": "^1.2.5",
+    "xtend": "^4.0.1"
+  }
+}
