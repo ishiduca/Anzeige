@@ -1,13 +1,14 @@
 'use strict'
-var http     = require('http')
-var path     = require('path')
-var url      = require('url')
-var xtend    = require('xtend')
-var body     = require('body/any')
-var ecstatic = require('ecstatic')(path.join(__dirname, 'public'))
-var Router   = require('router-line').Router
-var helper   = require('helper')
-var router   = new Router
+var http      = require('http')
+var path      = require('path')
+var url       = require('url')
+var xtend     = require('xtend')
+var body      = require('body/any')
+var ecstatic  = require('ecstatic')(path.join(__dirname, 'public'))
+var websocket = require('websocket-stream')
+var Router    = require('router-line').Router
+var helper    = require('helper')
+var router    = new Router
 
 router.POST('/api/twitter/post', post(require('api/twitter/post')))
 
@@ -21,6 +22,8 @@ var server = module.exports = http.createServer(function (req, res) {
     else
         ecstatic(req, res)
 })
+
+websocket.createServer({server: server}, require('app_websocket'))
 
 if (!module.parent) {
     var port = process.env.PORT || 3001

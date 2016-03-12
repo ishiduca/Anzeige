@@ -1,20 +1,42 @@
 {
   "name": "anzeige",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "display timelines like \"Afficheur\"",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "browserify src/main.js -o public/js/bundle.js",
     "start": "NODE_PATH=lib PORT=3001 node app"
+  },
+  "browserify": {
+    "transform": [
+      "reactify"
+    ]
   },
   "author": "ishiduca@gmail.com",
   "license": "MIT",
   "dependencies": {
+    "array-reduce": "0.0.0",
     "body": "^5.1.0",
     "ecstatic": "^1.4.0",
+    "flux-koime": "git://github.com/ishiduca/flux-koime.git#master",
+    "inherits": "^2.0.1",
     "json-stringify-safe": "^5.0.1",
+    "react": "^0.14.7",
+    "react-dom": "^0.14.7",
+    "readable-stream": "^2.0.5",
     "router-line": "^0.2.1",
+    "tape": "^4.5.1",
+    "tumblr.js": "0.0.7",
     "twitter": "^1.2.5",
+    "url-parse": "^1.0.5",
+    "websocket-stream": "^3.1.0",
+    "webworkify": "^1.1.0",
     "xtend": "^4.0.1"
+  },
+  "devDependencies": {
+    "duplexer2": "^0.1.4",
+    "reactify": "^1.1.1",
+    "through2": "^2.0.1"
   }
 }
