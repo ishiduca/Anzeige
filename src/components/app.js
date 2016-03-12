@@ -16,7 +16,10 @@ var App = module.exports = React.createClass({
         return (
             <section>
                 <FormFilterColumn context={context} />
-                <Modal context={context} />
+                <Modal
+                    context={context}
+                    data={this.state.modal}
+                />
                 <Columns
                     context={context}
                     columns={this.state.columns}
@@ -30,6 +33,7 @@ var App = module.exports = React.createClass({
             columns: {
                 all: []
             }
+          , modal: null
         }
     }
   , componentDidMount: function () {
@@ -37,6 +41,9 @@ var App = module.exports = React.createClass({
         this.props.context.storeWsMFilter.filterStream.on('data', function (list) {
             me.state.columns.all = list
             me.setState(me.state)
+        })
+        this.props.context.storeModal.on('data', function (data) {
+            me.setState({modal: data})
         })
     }
 })

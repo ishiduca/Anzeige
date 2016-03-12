@@ -6,7 +6,8 @@ var websocket = require('websocket-stream')
 var parse     = require('url-parse')
 var opt       = parse(location.href)
 var ws        = websocket(['ws://', opt.host].join(''))
-// vars
+// var
+var URI_TWITTER_POST       = [opt.protocol, '//', opt.host, '/api/twitter/post'].join('')
 var TWITTER_USER_STREAM    = 'twitter@user/stream'
 var TWITTER_LISTS_PAINTERS = 'twitter@lists/painters'
 var TUMBLR_USER_DASHBOARD  = 'tumblr@user/dashboard'
@@ -16,7 +17,9 @@ var GET_LIST = 'getList'
 var actWsMTwitterUserStream     = new Action(TWITTER_USER_STREAM,    GET_LIST)
 var actWsMTwitterListsPainters  = new Action(TWITTER_LISTS_PAINTERS, GET_LIST)
 var actWsMTumblrUserDashboard   = new Action(TUMBLR_USER_DASHBOARD,  GET_LIST)
-var actWsMFilter = new (require('./actions/websocket-message-filter'))
+var actWsMFilter                = new (require('./actions/websocket-message-filter'))
+var actTwitterPost              = new (require('./actions/twitter-post'))(URI_TWITTER_POST)
+var actModal                    = new (require('./actions/modal'))
 
 actWsMTwitterUserStream.push = function (_tweets) {
     var tweets = _tweets.filter(function (tweet) {
@@ -52,6 +55,8 @@ var StoreWebsocketMessageCombine = require('./stores/websocket-message-combine')
 var storeWsMCombine              = new StoreWebsocketMessageCombine(work(workerCombine))
 var StoreWebsocketMessageFilter  = require('./stores/websocket-message-filter')
 var storeWsMFilter               = new StoreWebsocketMessageFilter(work(workerFilter))
+var storeTwitterPost             = new (require('./stores/twitter-post'))
+var storeModal                   = new (require('./stores/modal'))
 
 ;[  storeWsMTwitterUserStream
   , storeWsMTwitterListsPainters
@@ -68,12 +73,16 @@ require('flux-koime')({
       , actWsMTwitterListsPainters
       , actWsMTumblrUserDashboard
       , actWsMFilter
+      , actTwitterPost
+      , actModal
     ]
   , stores: [
         storeWsMTwitterUserStream
       , storeWsMTwitterListsPainters
       , storeWsMTumblrUserDashboard
       , storeWsMFilter
+      , storeTwitterPost
+      , storeModal
     ]
 })
 
@@ -81,7 +90,11 @@ var App = require('./components/app')
 
 ReactDOM.render(<App context={{
     actWsMFilter: actWsMFilter
+  , actTwitterPost: actTwitterPost
+  , actModal: actModal
   , storeWsMFilter: storeWsMFilter
+  , storeTwitterPost: storeTwitterPost
+  , storeModal: storeModal
 //,    storeWsMCombine: storeWsMCombine
 //  , storeWsMTwitterUserStream: storeWsMTwitterUserStream
 //  , storeWsMTwitterListsPainters: storeWsMTwitterListsPainters

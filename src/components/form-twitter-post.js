@@ -36,7 +36,12 @@ var FormTwitterPost = module.exports = React.createClass({
   , handleSubmit: function (ev) {
         ev.preventDefault()
         var val = this.state.yourTweet.trim()
-        console.log('"%s"', val)
+        var params = {'status': val}
+        if ((this.state.tweet || {}).in_reply_to_status_id)
+            params.in_reply_to_status_id = this.state.tweet.in_reply_to_status_id
+
+        this.props.context.actTwitterPost.post(params)
+
         this.setState(this._getInitialState())
     }
   , handleChange: function (ev) {
@@ -49,7 +54,6 @@ var FormTwitterPost = module.exports = React.createClass({
           , yourTweetLength: len
           , disabled: disabled
         })
-        console.log('"%s"', val)
     }
   , handleResetButton: function () {
         this.setState(this._getInitialState())

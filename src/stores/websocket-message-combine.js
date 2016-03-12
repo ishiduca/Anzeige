@@ -4,7 +4,7 @@ var inherits = require('inherits')
 inherits(StoreWebsocketMessageCombine, stream.Transform)
 module.exports = StoreWebsocketMessageCombine
 
-var maxLength = 400
+var maxLength = 1200
 
 function StoreWebsocketMessageCombine (worker) {
     if (!(this instanceof StoreWebsocketMessageCombine))

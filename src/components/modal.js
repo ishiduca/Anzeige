@@ -1,13 +1,19 @@
-var React = require('react')
+var React    = require('react')
+var MediaBox = require('./media-box')
 
 var FormFilterColumn = module.exports = React.createClass({
     render: function () {
+        var props = this.props
+        var context = props.context
+        var exists  = props.data && props.data.id
         return (
-            <div className={this.state.isActive ? 'modal is-active' : 'modal'}>
+            <div className={exists ? 'modal is-active' : 'modal'}>
                 <div className="modal-background"></div>
                 <div className="modal-container">
                     <div className="modal-content">
-                        hge
+                        {
+                            exists && (<MediaBox context={context} data={props.data} />)
+                        }
                     </div>
                 </div>
                 <button
@@ -18,9 +24,6 @@ var FormFilterColumn = module.exports = React.createClass({
         )
     }
   , hancleCloseButton: function (ev) {
-        this.setState({isActive: ! this.state.isActive})
-   }
- , getInitialState: function () {
-        return {isActive: false}
+        this.props.context.actModal.putActive({})
    }
 })
