@@ -30,8 +30,8 @@ function StoreWebsocketMessage (label, worker, mapper) {
 }
 
 StoreWebsocketMessage.prototype.getList = function (list, done) {
-    this.worker.postMessage([list, this.list])
     done()
+    this.worker.postMessage([list, this.list])
 }
 
 StoreWebsocketMessage.prototype.pushList = function () {

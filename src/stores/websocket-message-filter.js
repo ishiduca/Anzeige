@@ -47,8 +47,8 @@ function FilterStream (worker) {
 FilterStream.prototype._transform = function (list, enc, done) {
     if (! this.filterStr) return done(null, list)
 
-    this.worker.postMessage({list: list, filterStr: this.filterStr})
     done()
+    this.worker.postMessage({list: list, filterStr: this.filterStr})
 }
 
 FilterStream.prototype.pushList = function () {

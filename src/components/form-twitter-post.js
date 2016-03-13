@@ -2,11 +2,16 @@ var React = require('react')
 
 var FormTwitterPost = module.exports = React.createClass({
     render: function () {
+        var props = this.props
+        var reply = props.reply || {}
+        var screen_name = (reply.user || {}).screen_name ? '@' + reply.user.screen_name : ''
+        var yourTweet = this.state.yourTweet || screen_name || ''
+        var yourTweetLength = yourTweet.length
         return (
             <div id="box-twitter-post">
                 <div className="columns">
-                    <div className="column">{this.state.in_reply_to_status_id || '--'}</div>
-                    <div className="column is-1">{this.state.yourTweetLength}</div>
+                    <div className="column">{(reply || {}).in_reply_to_status_id || '--'}</div>
+                    <div className="column is-1">{yourTweetLength}</div>
                 </div>
                 <form
                     onSubmit={this.handleSubmit}
@@ -16,7 +21,7 @@ var FormTwitterPost = module.exports = React.createClass({
                         className="input"
                         type="text"
                         placeholder="what to tweet ?"
-                        value={this.state.yourTweet}
+                        value={yourTweet}
                         onChange={this.handleChange}
                     />
                     <button
@@ -37,10 +42,11 @@ var FormTwitterPost = module.exports = React.createClass({
         ev.preventDefault()
         var val = this.state.yourTweet.trim()
         var params = {'status': val}
-        if ((this.state.tweet || {}).in_reply_to_status_id)
-            params.in_reply_to_status_id = this.state.tweet.in_reply_to_status_id
+        if ((this.props.reply || {}).in_reply_to_status_id)
+            params.in_reply_to_status_id = this.props.reply.in_reply_to_status_id
 
         this.props.context.actTwitterPost.post(params)
+        this.props.context.actPrepareReply.prepare({})
 
         this.setState(this._getInitialState())
     }
@@ -57,6 +63,7 @@ var FormTwitterPost = module.exports = React.createClass({
     }
   , handleResetButton: function () {
         this.setState(this._getInitialState())
+        this.props.context.actPrepareReply.prepare({})
     }
   , getInitialState: function () {
         return this._getInitialState()
@@ -65,7 +72,6 @@ var FormTwitterPost = module.exports = React.createClass({
         return {
             yourTweet: ''
           , disabled: true
-          , in_reply_to_status_id: null
           , yourTweetLength: 0
         }
     }

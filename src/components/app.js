@@ -24,7 +24,10 @@ var App = module.exports = React.createClass({
                     context={context}
                     columns={this.state.columns}
                 />
-                <FormTwitterPost context={context} />
+                <FormTwitterPost
+                    context={context}
+                    reply={this.state.reply}
+                />
             </section>
         )
     }
@@ -34,6 +37,7 @@ var App = module.exports = React.createClass({
                 all: []
             }
           , modal: null
+          , reply: null
         }
     }
   , componentDidMount: function () {
@@ -44,6 +48,9 @@ var App = module.exports = React.createClass({
         })
         this.props.context.storeModal.on('data', function (data) {
             me.setState({modal: data})
+        })
+        this.props.context.storePrepareReply.on('data', function (data) {
+            me.setState({reply: data})
         })
     }
 })

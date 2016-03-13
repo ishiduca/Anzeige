@@ -25,8 +25,8 @@ function StoreWebsocketMessageCombine (worker) {
 }
 
 StoreWebsocketMessageCombine.prototype._transform = function (list, enc, done) {
-    this.worker.postMessage([list, this.list])
     done()
+    this.worker.postMessage([list, this.list])
 }
 
 StoreWebsocketMessageCombine.prototype.pushList = function () {

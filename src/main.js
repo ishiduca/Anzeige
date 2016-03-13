@@ -20,6 +20,7 @@ var actWsMTumblrUserDashboard   = new Action(TUMBLR_USER_DASHBOARD,  GET_LIST)
 var actWsMFilter                = new (require('./actions/websocket-message-filter'))
 var actTwitterPost              = new (require('./actions/twitter-post'))(URI_TWITTER_POST)
 var actModal                    = new (require('./actions/modal'))
+var actPrepareReply             = new (require('./actions/prepare-reply'))
 
 actWsMTwitterUserStream.push = function (_tweets) {
     var tweets = _tweets.filter(function (tweet) {
@@ -57,7 +58,8 @@ var StoreWebsocketMessageFilter  = require('./stores/websocket-message-filter')
 var storeWsMFilter               = new StoreWebsocketMessageFilter(work(workerFilter))
 var storeTwitterPost             = new (require('./stores/twitter-post'))
 var storeModal                   = new (require('./stores/modal'))
-
+var storePrepareReply            = new (require('./stores/prepare-reply'))
+// piped for stream merge
 ;[  storeWsMTwitterUserStream
   , storeWsMTwitterListsPainters
   , storeWsMTumblrUserDashboard
@@ -75,6 +77,7 @@ require('flux-koime')({
       , actWsMFilter
       , actTwitterPost
       , actModal
+      , actPrepareReply
     ]
   , stores: [
         storeWsMTwitterUserStream
@@ -83,6 +86,7 @@ require('flux-koime')({
       , storeWsMFilter
       , storeTwitterPost
       , storeModal
+      , storePrepareReply
     ]
 })
 
@@ -92,9 +96,11 @@ ReactDOM.render(<App context={{
     actWsMFilter: actWsMFilter
   , actTwitterPost: actTwitterPost
   , actModal: actModal
+  , actPrepareReply: actPrepareReply
   , storeWsMFilter: storeWsMFilter
   , storeTwitterPost: storeTwitterPost
   , storeModal: storeModal
+  , storePrepareReply: storePrepareReply
 //,    storeWsMCombine: storeWsMCombine
 //  , storeWsMTwitterUserStream: storeWsMTwitterUserStream
 //  , storeWsMTwitterListsPainters: storeWsMTwitterListsPainters
