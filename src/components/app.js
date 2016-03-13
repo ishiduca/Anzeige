@@ -53,4 +53,9 @@ var App = module.exports = React.createClass({
             me.setState({reply: data})
         })
     }
+  , componentWillUnmount: function () {
+        this.props.context.storeWsMFilter.filterStream.removeAllListeners()
+        this.props.context.storeModal.removeAllListeners()
+        this.props.context.storePrepareReply.removeAllListeners()
+    }
 })
