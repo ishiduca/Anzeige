@@ -3,6 +3,7 @@ var xtend = require('xtend')
 var FormFilterColumn = require('./form-filter-column')
 var Modal            = require('./modal')
 var Columns          = require('./columns')
+var ConfigBoard      = require('./config-board')
 var FormTwitterPost  = require('./form-twitter-post')
 
 //var ALL                    = 'all'
@@ -16,6 +17,10 @@ var App = module.exports = React.createClass({
         return (
             <section>
                 <FormFilterColumn context={context} />
+                <ConfigBoard
+                    context={context}
+                    configs={this.state.configs}
+                />
                 <Modal
                     context={context}
                     data={this.state.modal}
@@ -38,6 +43,12 @@ var App = module.exports = React.createClass({
             }
           , modal: null
           , reply: null
+          , configs: {
+                notification: {
+                    keywords: ''
+                  , modal: null
+                }
+            }
         }
     }
   , componentDidMount: function () {
@@ -52,10 +63,23 @@ var App = module.exports = React.createClass({
         this.props.context.storePrepareReply.on('data', function (data) {
             me.setState({reply: data})
         })
+        this.props.context.storeConfigBoardModal.on('data', function (flg) {
+            var notification = xtend(me.state.configs.notification, {modal: flg})
+            me.state.configs.notification = notification
+            me.setState(me.state)
+        })
+        this.props.context.storeConfigBoardKeywords.on('data', function (keywords) {
+            var notification = xtend(me.state.configs.notification, {keywords: keywords})
+            me.state.configs.notification = notification
+            me.setState(me.state)
+        })
+        this.props.context.actConfigBoardKeywords.gets()
     }
   , componentWillUnmount: function () {
         this.props.context.storeWsMFilter.filterStream.removeAllListeners()
         this.props.context.storeModal.removeAllListeners()
         this.props.context.storePrepareReply.removeAllListeners()
+        this.props.context.storeConfigBoardModal.removeAllListeners()
+        this.props.context.storeConfigBoardKeywords.removeAllListeners()
     }
 })

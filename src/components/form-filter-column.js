@@ -17,6 +17,6 @@ var FormFilterColumn = module.exports = React.createClass({
   , handleChange: function (ev) {
         ev.preventDefault()
         var data = ev.target.value
-        this.props.context.actWsMFilter.grep(data)
+        this.props.context.actCommandLineFilter.dispatch(data)
     }
 })

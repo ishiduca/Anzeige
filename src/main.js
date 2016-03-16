@@ -1,18 +1,34 @@
 var React    = require('react')
 var ReactDOM = require('react-dom')
 var Action   = require('flux-koime/action')
+var parse    = require('url-parse')
+var opt      = parse(location.href)
+// vars
+var WEB_SOCKET_URI            = ['ws://', opt.host].join('')
+var URI_TWITTER_POST          = [opt.protocol, '//', opt.host, '/api/twitter/post'].join('')
+var TWITTER_USER_STREAM       = 'twitter@user/stream'
+var TWITTER_LISTS_PAINTERS    = 'twitter@lists/painters'
+var TUMBLR_USER_DASHBOARD     = 'tumblr@user/dashboard'
+var TIMELINE_FILTER           = 'timeline/filter'
+var GET_LIST                  = 'getList'
+var DB_NAME                   = 'Anzeige::configs'
+var NOTIFICATION_KEYWORDS_KEY = 'notification.keywords'
 // api
+var levelup   = require('levelup')
+var db        = levelup(DB_NAME, {db: require('localstorage-down')})
+var notifyHelperTwitter = require('./api/notification-helpers/twitter')
+var notifyHelperTumblr  = require('./api/notification-helpers/tumblr')
+var notify    = new (require('./api/notification'))({
+                    twitter: {
+                        'user/stream':    notifyHelperTwitter
+                      , 'lists/painters': notifyHelperTwitter
+                    }
+                  , tumblr: {
+                        'user/dashboard': notifyHelperTumblr
+                    }
+                })
 var websocket = require('websocket-stream')
-var parse     = require('url-parse')
-var opt       = parse(location.href)
-var ws        = websocket(['ws://', opt.host].join(''))
-// var
-var URI_TWITTER_POST       = [opt.protocol, '//', opt.host, '/api/twitter/post'].join('')
-var TWITTER_USER_STREAM    = 'twitter@user/stream'
-var TWITTER_LISTS_PAINTERS = 'twitter@lists/painters'
-var TUMBLR_USER_DASHBOARD  = 'tumblr@user/dashboard'
-var TIMELINE_FILTER        = 'timeline/filter'
-var GET_LIST = 'getList'
+var ws        = websocket(WEB_SOCKET_URI)
 // action
 var actWsMTwitterUserStream     = new Action(TWITTER_USER_STREAM,    GET_LIST)
 var actWsMTwitterListsPainters  = new Action(TWITTER_LISTS_PAINTERS, GET_LIST)
@@ -21,6 +37,15 @@ var actWsMFilter                = new (require('./actions/websocket-message-filt
 var actTwitterPost              = new (require('./actions/twitter-post'))(URI_TWITTER_POST)
 var actModal                    = new (require('./actions/modal'))
 var actPrepareReply             = new (require('./actions/prepare-reply'))
+var actConfigBoardModal         = new (require('./actions/config-board-modal'))
+var actConfigBoardKeywords      = new (require('./actions/config-board-keywords'))({
+                                        db: db
+                                      , key_name: NOTIFICATION_KEYWORDS_KEY
+                                  })
+var actCommandLineFilter        = new (require('./actions/command-line-filter'))(
+                                      actConfigBoardModal  //
+                                    , actWsMFilter         // actWsMFilter は引数の最後に指定
+                                  )
 
 actWsMTwitterUserStream.push = function (_tweets) {
     var tweets = _tweets.filter(function (tweet) {
@@ -28,7 +53,11 @@ actWsMTwitterUserStream.push = function (_tweets) {
     })
     if (tweets.length) Action.prototype.push.apply(this, [tweets])
 }
-
+// notify setup
+actConfigBoardKeywords.on('update', function (keywords) {
+    notify.update(keywords)
+})
+ws.pipe(notify)
 // websocket routing
 require('./actions/websocket-message-router')(ws)(
     actWsMTwitterUserStream
@@ -59,6 +88,8 @@ var storeWsMFilter               = new StoreWebsocketMessageFilter(work(workerFi
 var storeTwitterPost             = new (require('./stores/twitter-post'))
 var storeModal                   = new (require('./stores/modal'))
 var storePrepareReply            = new (require('./stores/prepare-reply'))
+var storeConfigBoardModal        = new (require('./stores/config-board-modal'))
+var storeConfigBoardKeywords     = new (require('./stores/config-board-keywords'))
 // piped for stream merge
 ;[  storeWsMTwitterUserStream
   , storeWsMTwitterListsPainters
@@ -78,6 +109,8 @@ require('flux-koime')({
       , actTwitterPost
       , actModal
       , actPrepareReply
+      , actConfigBoardModal
+      , actConfigBoardKeywords
     ]
   , stores: [
         storeWsMTwitterUserStream
@@ -87,20 +120,28 @@ require('flux-koime')({
       , storeTwitterPost
       , storeModal
       , storePrepareReply
+      , storeConfigBoardModal
+      , storeConfigBoardKeywords
     ]
 })
 
 var App = require('./components/app')
 
 ReactDOM.render(<App context={{
-    actWsMFilter: actWsMFilter
-  , actTwitterPost: actTwitterPost
+/*    actWsMFilter: actWsMFilter
+  , */
+    actTwitterPost: actTwitterPost
   , actModal: actModal
   , actPrepareReply: actPrepareReply
+  , actConfigBoardModal: actConfigBoardModal
+  , actConfigBoardKeywords: actConfigBoardKeywords
+  , actCommandLineFilter: actCommandLineFilter
   , storeWsMFilter: storeWsMFilter
   , storeTwitterPost: storeTwitterPost
   , storeModal: storeModal
   , storePrepareReply: storePrepareReply
+  , storeConfigBoardModal: storeConfigBoardModal
+  , storeConfigBoardKeywords: storeConfigBoardKeywords
 //,    storeWsMCombine: storeWsMCombine
 //  , storeWsMTwitterUserStream: storeWsMTwitterUserStream
 //  , storeWsMTwitterListsPainters: storeWsMTwitterListsPainters

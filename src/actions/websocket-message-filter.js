@@ -11,6 +11,9 @@ function ActionWebsocketMessageFilter () {
     Action.call(this, 'timeline/filter', 'grep')
 }
 
-ActionWebsocketMessageFilter.prototype.grep = function (filterStr) {
-    this.push(filterStr)
+ActionWebsocketMessageFilter.prototype.test = function (filterStr) {
+    return true
 }
+//ActionWebsocketMessageFilter.prototype.grep = function (filterStr) {
+//    this.push(filterStr)
+//}
