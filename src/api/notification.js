@@ -44,7 +44,11 @@ NotificationStream.prototype._write = function (buf, enc, done) {
             var result = test(data, me.keywords)
             if (result) {
                 me.notif(result.title, result.option, function (err, notify) {
-                    err && console.error(err)
+                    if (err) return console.error(err)
+                    notify.onerror = function (err) { console.error(err) }
+                    notify.onclick = function () {
+                        window.open(result.link)
+                    }
                 })
             }
         })

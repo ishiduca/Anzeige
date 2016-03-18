@@ -20,6 +20,7 @@ module.exports = function (me) {
         function mm (data) {
             return {
                 id: data.id
+              , date: new Date(data.created_at)
               , user: data.user || {}
               , link: ['https://twitter.com'
                       , (data.user || {}).screen_name, 'status', data.id_str].join('/')

@@ -22,6 +22,7 @@ module.exports = function (me) {
         function mm (post) {
             return {
                 id: post.id
+              , date: parse_date(post.date)
               , user: {
                     screen_name: post.blog_name
                   , name: post.blog_name
@@ -41,6 +42,11 @@ module.exports = function (me) {
               })
               , in_reply_to_status_id: null
             }
+        }
+
+        function parse_date (date) {
+            var d = date.split(/[\s:\-]/).map(function (s) { return parseInt(s) })
+            return new Date(d[0], d[1] - 1, d[2], d[3], d[4], d[5])
         }
     })
 }

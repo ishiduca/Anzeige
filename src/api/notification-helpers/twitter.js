@@ -1,5 +1,7 @@
 module.exports = test
 
+var HTTPS_TWITTER_COM = 'https://twitter.com'
+
 function test (data, keywords) {
     for (var i = 0, len = keywords.length; i < len; i++) {
         var keyword = keywords[i]
@@ -20,6 +22,7 @@ function test (data, keywords) {
                 body: data.text
               , icon: (data.user || {}).profile_image_url
             }
+          , link: [HTTPS_TWITTER_COM, data.user.screen_name, 'status', data.id_str ].join('/')
         }
     }
 }

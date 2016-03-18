@@ -18,6 +18,10 @@ module.exports = function (post, keywords) {
                 body: post.body || post.text || post.slug || post.caption
               , icon: ['https://api.tumblr.com/v2/blog', parse(post.post_url).hostname, 'avatar'].join('/')
             }
+          , link: post.post_url
+        , link: post.post_url
+      , link: post.post_url
+    , link: post.post_url
         }
     }
 }
