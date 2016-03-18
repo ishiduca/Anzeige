@@ -1,6 +1,6 @@
 {
   "name": "anzeige",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "display timelines like \"Afficheur\"",
   "main": "app.js",
   "scripts": {

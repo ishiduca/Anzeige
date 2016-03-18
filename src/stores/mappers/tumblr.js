@@ -46,7 +46,7 @@ module.exports = function (me) {
 
         function parse_date (date) {
             var d = date.split(/[\s:\-]/).map(function (s) { return parseInt(s) })
-            return new Date(d[0], d[1] - 1, d[2], d[3], d[4], d[5])
+            return new Date(d[0], (d[1] - 1), d[2], (d[3] + 9), d[4], d[5])
         }
     })
 }
