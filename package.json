@@ -1,11 +1,11 @@
 {
   "name": "anzeige",
-  "version": "0.1.1",
+  "version": "0.2.1",
   "description": "display timelines like \"Afficheur\"",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "development": "DEBUG='twitter@user/stream,twitter@lists/painters,tumblr@user/dashboard' NODE_PATH=lib PORT=3001 node app",
+    "development": "DEBUG='twitter@user/stream,twitter@lists/painters,twitter@lists/otaerocom-av,tumblr@user/dashboard' NODE_PATH=lib PORT=3001 node app",
     "build": "browserify src/main.js -o public/js/bundle.js",
     "start": "NODE_PATH=lib PORT=3001 node app"
   },

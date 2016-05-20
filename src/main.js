@@ -4,15 +4,16 @@ var Action   = require('flux-koime/action')
 var parse    = require('url-parse')
 var opt      = parse(location.href)
 // vars
-var WEB_SOCKET_URI            = ['ws://', opt.host].join('')
-var URI_TWITTER_POST          = [opt.protocol, '//', opt.host, '/api/twitter/post'].join('')
-var TWITTER_USER_STREAM       = 'twitter@user/stream'
-var TWITTER_LISTS_PAINTERS    = 'twitter@lists/painters'
-var TUMBLR_USER_DASHBOARD     = 'tumblr@user/dashboard'
-var TIMELINE_FILTER           = 'timeline/filter'
-var GET_LIST                  = 'getList'
-var DB_NAME                   = 'Anzeige::configs'
-var NOTIFICATION_KEYWORDS_KEY = 'notification.keywords'
+var WEB_SOCKET_URI             = ['ws://', opt.host].join('')
+var URI_TWITTER_POST           = [opt.protocol, '//', opt.host, '/api/twitter/post'].join('')
+var TWITTER_USER_STREAM        = 'twitter@user/stream'
+var TWITTER_LISTS_PAINTERS     = 'twitter@lists/painters'
+var TWITTER_LISTS_OTAEROCOM_AV = 'twitter@lists/otaerocom-av'
+var TUMBLR_USER_DASHBOARD      = 'tumblr@user/dashboard'
+var TIMELINE_FILTER            = 'timeline/filter'
+var GET_LIST                   = 'getList'
+var DB_NAME                    = 'Anzeige::configs'
+var NOTIFICATION_KEYWORDS_KEY  = 'notification.keywords'
 // api
 var levelup   = require('levelup')
 var db        = levelup(DB_NAME, {db: require('localstorage-down')})
@@ -20,8 +21,9 @@ var notifyHelperTwitter = require('./api/notification-helpers/twitter')
 var notifyHelperTumblr  = require('./api/notification-helpers/tumblr')
 var notify    = new (require('./api/notification'))({
                     twitter: {
-                        'user/stream':    notifyHelperTwitter
-                      , 'lists/painters': notifyHelperTwitter
+                        'user/stream':        notifyHelperTwitter
+                      , 'lists/painters':     notifyHelperTwitter
+                      , 'lists/otaerocom-av': notifyHelperTwitter
                     }
                   , tumblr: {
                         'user/dashboard': notifyHelperTumblr
@@ -32,6 +34,7 @@ var ws        = websocket(WEB_SOCKET_URI)
 // action
 var actWsMTwitterUserStream     = new Action(TWITTER_USER_STREAM,    GET_LIST)
 var actWsMTwitterListsPainters  = new Action(TWITTER_LISTS_PAINTERS, GET_LIST)
+var actWsMTwitterListsOtaerocomAv = new Action(TWITTER_LISTS_OTAEROCOM_AV, GET_LIST)
 var actWsMTumblrUserDashboard   = new Action(TUMBLR_USER_DASHBOARD,  GET_LIST)
 var actWsMFilter                = new (require('./actions/websocket-message-filter'))
 var actTwitterPost              = new (require('./actions/twitter-post'))(URI_TWITTER_POST)
@@ -62,6 +65,7 @@ ws.pipe(notify)
 require('./actions/websocket-message-router')(ws)(
     actWsMTwitterUserStream
   , actWsMTwitterListsPainters
+  , actWsMTwitterListsOtaerocomAv
   , actWsMTumblrUserDashboard
 )
 
@@ -79,6 +83,8 @@ var storeWsMTwitterUserStream    = new StoreWebsocketMessage(TWITTER_USER_STREAM
                                      , work(workerTwitter), work(mapperTwitter))
 var storeWsMTwitterListsPainters = new StoreWebsocketMessage(TWITTER_LISTS_PAINTERS
                                      , work(workerTwitter), work(mapperTwitter))
+var storeWsMTwitterListsOtaerocomAv = new StoreWebsocketMessage(TWITTER_LISTS_OTAEROCOM_AV
+                                     , work(workerTwitter), work(mapperTwitter))
 var storeWsMTumblrUserDashboard  = new StoreWebsocketMessage(TUMBLR_USER_DASHBOARD
                                      , work(workerTumblr), work(mapperTumblr))
 var StoreWebsocketMessageCombine = require('./stores/websocket-message-combine')
@@ -93,6 +99,7 @@ var storeConfigBoardKeywords     = new (require('./stores/config-board-keywords'
 // piped for stream merge
 ;[  storeWsMTwitterUserStream
   , storeWsMTwitterListsPainters
+  , storeWsMTwitterListsOtaerocomAv
   , storeWsMTumblrUserDashboard
 ].forEach(function (store) {
     store.pipe(storeWsMCombine)
@@ -104,6 +111,7 @@ require('flux-koime')({
     actions: [
         actWsMTwitterUserStream
       , actWsMTwitterListsPainters
+      , actWsMTwitterListsOtaerocomAv
       , actWsMTumblrUserDashboard
       , actWsMFilter
       , actTwitterPost
@@ -115,6 +123,7 @@ require('flux-koime')({
   , stores: [
         storeWsMTwitterUserStream
       , storeWsMTwitterListsPainters
+      , storeWsMTwitterListsOtaerocomAv
       , storeWsMTumblrUserDashboard
       , storeWsMFilter
       , storeTwitterPost
